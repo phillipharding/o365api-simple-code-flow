@@ -8,61 +8,64 @@ using System.Web;
 
 namespace SimpleWebAppCodeFlow.App_Classes
 {
-    public static class AppConfigSettings
-    {
-        public const string ClientId = "ClientId";
-        public const string ClientSecret = "ClientSecret";
-        public const string AuthorizationUri = "AuthorizationUri";
-        public const string TokenIssueingUri = "TokenIssueingUri";
-        public const string RedirectUri = "RedirectUri";
-        public const string RedirectUriLocalHost = "RedirectUriLocalHost";
-        public const string ExchangeResourceUri = "ExchangeResourceUri";
-        public const string SignoutUri = "SignoutUri";
-    }
+   public static class AppConfigSettings
+   {
+      public const string ClientId = "ClientId";
+      public const string ClientSecret = "ClientSecret";
+      public const string AuthorizationUri = "AuthorizationUri";
+      public const string TokenIssueingUri = "TokenIssueingUri";
+      public const string RedirectUri = "RedirectUri";
+      public const string RedirectUriLocalHost = "RedirectUriLocalHost";
+      public const string ExchangeResourceUri = "ExchangeResourceUri";
+      public const string SharePointResourceUri = "SharePointResourceUri";
+      public const string SignoutUri = "SignoutUri";
+   }
 
-    public class AppConfig
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string AuthorizationUri { get; set; }
-        public string TokenIssueingUri { get; set; }
-        public string SignoutUri { get; set; }
-        public string RedirectUri { get; set; }
-        public string ExchangeResourceUri { get; set; }
+   public class AppConfig
+   {
+      public string ClientId { get; set; }
+      public string ClientSecret { get; set; }
+      public string AuthorizationUri { get; set; }
+      public string TokenIssueingUri { get; set; }
+      public string SignoutUri { get; set; }
+      public string RedirectUri { get; set; }
+      public string ExchangeResourceUri { get; set; }
+      public string SharePointResourceUri { get; set; }
 
-        public AppConfig()
-        {
-            this.ClientId = this.Read(AppConfigSettings.ClientId);
-            this.ClientSecret = this.Read(AppConfigSettings.ClientSecret);
-            this.AuthorizationUri = this.Read(AppConfigSettings.AuthorizationUri);
-            this.TokenIssueingUri = this.Read(AppConfigSettings.TokenIssueingUri);
-            this.SignoutUri = this.Read(AppConfigSettings.SignoutUri);
-            this.RedirectUri = this.Read(
+      public AppConfig()
+      {
+         this.ClientId = this.Read(AppConfigSettings.ClientId);
+         this.ClientSecret = this.Read(AppConfigSettings.ClientSecret);
+         this.AuthorizationUri = this.Read(AppConfigSettings.AuthorizationUri);
+         this.TokenIssueingUri = this.Read(AppConfigSettings.TokenIssueingUri);
+         this.SignoutUri = this.Read(AppConfigSettings.SignoutUri);
+         this.RedirectUri = this.Read(
 #if DEBUG
             AppConfigSettings.RedirectUriLocalHost
 #else
             AppConfigSettings.RedirectUri
 #endif
             );
-            this.ExchangeResourceUri = this.Read(AppConfigSettings.ExchangeResourceUri);
-        }
+         this.ExchangeResourceUri = this.Read(AppConfigSettings.ExchangeResourceUri);
+         this.SharePointResourceUri = this.Read(AppConfigSettings.SharePointResourceUri);
+      }
 
-        private string Read(string appSettingName)
-        {
-            string res = String.Empty;
+      private string Read(string appSettingName)
+      {
+         string res = String.Empty;
 
-            try
-            {   // fails if null or empty
-                string appSetting = ConfigurationManager.AppSettings[appSettingName];
-                res = appSetting;
-            }
-            catch { }
+         try
+         {   // fails if null or empty
+            string appSetting = ConfigurationManager.AppSettings[appSettingName];
+            res = appSetting;
+         }
+         catch { }
 
-            return res;
-        }
+         return res;
+      }
 
 
-    }
+   }
 }
 // MIT License: 
 

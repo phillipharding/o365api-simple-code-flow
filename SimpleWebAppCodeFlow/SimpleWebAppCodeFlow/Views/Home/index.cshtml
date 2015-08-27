@@ -1,120 +1,143 @@
-﻿@model SimpleWebAppCodeFlow.Models.AppState 
+﻿@model SimpleWebAppCodeFlow.Models.AppState
 @{
-	ViewBag.Title = "OAuth2 Play WebApp";
+   ViewBag.Title = "OAuth2 Play WebApp";
 }
 
 <div class="jumbotron">
-	<h2>Demo web app performing an OAuth2 Authorisation Code grant flow to aquire an AccessToken</h2>
+   <h2>Demo web app performing an OAuth2 Authorisation Code grant flow to aquire an AccessToken</h2>
 
-	@if (Model.AppIsAuthorized == false)
-	{ // App is not yet authorized !
-		if (!String.IsNullOrEmpty(Model.ErrorMessage))
-		{
-			<div class="alert alert-danger" role="alert">
-				Error: Authorization failed with: [<i>@Model.ErrorMessage</i>]
-			</div>
-		}
-		using (Html.BeginForm("", "Home", FormMethod.Post))
-		{
-			<table>
-				<tr>
-					<td><input width="300" type="submit" name="action:Authorize" value="Authorize App" class="btn btn-primary" /></td>
-				</tr>
-			</table>
-		}
-	}
+   @if (Model.AppIsAuthorized == false)
+   { // App is not yet authorized !
+      if (!String.IsNullOrEmpty(Model.ErrorMessage))
+      {
+         <div class="alert alert-danger" role="alert">
+            Error: Authorization failed with: [<i>@Model.ErrorMessage</i>]
+         </div>
+      }
+      using (Html.BeginForm("", "Home", FormMethod.Post))
+      {
+         <table>
+            <tr>
+               <td><input width="300" type="submit" name="action:Authorize" value="Authorize App" class="btn btn-primary" /></td>
+            </tr>
+         </table>
+      }
+   }
 </div>
 <div>
-@if (Model.AppIsAuthorized == true)
-{ // We are authorized and hopefully get tokens ...
-	<div class="container">
-		<div class="row">
-			@if (Model.AccessTokenAquiredWithoutError)
-			{
-				<div class="col-md-6">
-					<div class="panel panel-default">
-						<div class="panel-heading"><h3 class="panel-title">Organisation</h3></div>
-						<div class="panel-body">@Model.TenantDomain</div>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="panel panel-default">
-						<div class="panel-heading"><h3 class="panel-title">Loggedon User</h3></div>
-						<div class="panel-body">@Model.LoggedOnUser</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div>
-						@using (Html.BeginForm("", "Home", FormMethod.Post))
-						{
-							@Html.HiddenFor(model => model.TenantId)
-							<input type="submit" name="action:StartOver" value="Logout and Start Again" class="btn btn-primary btn-lg btn-block" />
-						}
-					</div>
-					<br/><a href="https://account.activedirectory.windowsazure.com/applications/default.aspx" target="_blank" class="btn btn-default btn-lg btn-block">Remove this App</a>
-				</div>
-				<div class="col-md-9">
-					<div class="panel panel-default">
-						<div class="panel-heading"><h3 class="panel-title">Access Token</h3></div>
-						<div class="panel-body" style="-ms-word-break:break-all;word-break:break-all;"><a href="http://jwt.calebb.net/#jwt=@Model.AccessToken" target="_blank" class="alert-link">@Model.AccessToken</a></div>
-					</div>
-				</div>
-			}
-			else
-			{
-				<div class="col-md-12">
-					<div class="alert alert-danger" role="alert">
-						<b>Error Aquiring Access Token: [@Model.ErrorMessage]</b><br />
-					</div>
-				</div>
-			}
-		</div>
-		<div class="row">
-			<div class="col-md-2">
-				<h2 style="margin-top:0;"><small>Properties</small></h2>
-			</div>
-			<div class="col-md-10">
-				<form>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">TenantId</span>
-							@Html.TextBoxFor(model => model.TenantId, new { @class="form-control" })
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">TenantDomain</span>
-							@Html.TextBoxFor(model => model.TenantDomain, new { @class = "form-control" })
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">LoggedOnUser</span>
-							@Html.TextBoxFor(model => model.LoggedOnUser, new { @class = "form-control" })
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">AppIsAuthorized</span>
-							@Html.TextBoxFor(model => model.AppIsAuthorized, new { @class = "form-control" })
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">AccessTokenAquiredWithoutError</span>
-							@Html.TextBoxFor(model => model.AccessTokenAquiredWithoutError, new { @class = "form-control" })
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="input-group">
-							<span class="input-group-addon">AccessToken</span>
-							@Html.TextAreaFor(model => model.AccessToken, new { @class = "form-control", rows="6" })
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-}
-</div>
+   @if (Model.AppIsAuthorized == true)
+   { // We are authorized and hopefully get tokens ...
+      <div class="container">
+         <div class="row">
+            @if (Model.AccessTokenAquiredWithoutError)
+            {
+               <div class="col-md-6">
+                  <div class="panel panel-default">
+                     <div class="panel-heading"><h3 class="panel-title">Organisation</h3></div>
+                     <div class="panel-body">@Model.TenantDomain</div>
+                  </div>
+               </div>
+               <div class="col-md-6">
+                  <div class="panel panel-default">
+                     <div class="panel-heading"><h3 class="panel-title">Loggedon User</h3></div>
+                     <div class="panel-body">@Model.LoggedOnUser</div>
+                  </div>
+               </div>
+               <div class="col-md-3">
+                  <div>
+                     @using (Html.BeginForm("", "Home", FormMethod.Post))
+                     {
+                        @Html.HiddenFor(model => model.TenantId)
+                        <input type="submit" name="action:StartOver" value="Logout and Start Again" class="btn btn-primary btn-lg btn-block" />
+                     }
+                  </div>
+                  <br /><a href="https://account.activedirectory.windowsazure.com/applications/default.aspx" target="_blank" class="btn btn-default btn-lg btn-block">Remove this App</a>
+               </div>
+               <div class="col-md-9">
+                  <div class="panel panel-default">
+                     <div class="panel-heading"><h3 class="panel-title">Access Token</h3></div>
+                     <div class="panel-body" style="-ms-word-break:break-all;word-break:break-all;"><a href="http://jwt.calebb.net/#jwt=@Model.AccessToken" target="_blank" class="alert-link">@Model.AccessToken</a></div>
+                  </div>
+               </div>
+            }
+            else
+            {
+               <div class="col-md-12">
+                  <div class="alert alert-danger" role="alert">
+                     <b>Error Aquiring Access Token: [@Model.ErrorMessage]</b><br />
+                  </div>
+               </div>
+            }
+         </div>
+         <div class="row">
+            <div class="col-md-2">
+               <h2 style="margin-top:0;"><small>Properties</small></h2>
+            </div>
+            <div class="col-md-6">
+               <form>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">TenantId</span>
+                        @Html.TextBoxFor(model => model.TenantId, new { @class = "form-control" })
+                     </div>
+                  </div>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">TenantDomain</span>
+                        @Html.TextBoxFor(model => model.TenantDomain, new { @class = "form-control" })
+                     </div>
+                  </div>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">LoggedOnUser</span>
+                        @Html.TextBoxFor(model => model.LoggedOnUser, new { @class = "form-control" })
+                     </div>
+                  </div>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">AppIsAuthorized</span>
+                        @Html.TextBoxFor(model => model.AppIsAuthorized, new { @class = "form-control" })
+                     </div>
+                  </div>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">AccessTokenAquiredWithoutError</span>
+                        @Html.TextBoxFor(model => model.AccessTokenAquiredWithoutError, new { @class = "form-control" })
+                     </div>
+                  </div>
+                  <div class="form-group">
+                     <div class="input-group">
+                        <span class="input-group-addon">AccessToken</span>
+                        @Html.TextAreaFor(model => model.AccessToken, new { @class = "form-control", rows = "6" })
+                     </div>
+                  </div>
+               </form>
+            </div>
+            <div class="col-md-4">
+               <div class="panel panel-default">
+                  <div class="panel-heading"><h3 class="panel-title">Web Title via CSOM</h3></div>
+                  <div class="panel-body">@Model.CsomWebTitle</div>
+               </div>
+               <div class="panel panel-default">
+                  <div class="panel-heading"><h3 class="panel-title">Web URL via CSOM</h3></div>
+                  <div class="panel-body"><small><a href="@Model.CsomWebUrl" target="_blank">@Model.CsomWebUrl</a></small></div>
+               </div>
+               <div class="panel panel-default">
+                  <div class="panel-heading"><h3 class="panel-title">Web Lists via SP REST</h3></div>
+                  <div class="panel-body">
+                     <ul>
+                        @foreach (var list in Model.RestWebLists)
+                        {
+                           <li>
+                              @Html.Raw(list.Title)
+                           </li>
+                        }
+                     </ul>
+                  </div>
+               </div>
+            </div>
 
+         </div>
+      </div>
+   }
+</div>

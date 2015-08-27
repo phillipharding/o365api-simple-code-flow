@@ -7,32 +7,35 @@ using System.Web;
 
 namespace SimpleWebAppCodeFlow.Models
 {
-    public class AppState
-    {
-        public string TenantId { get; set; }
-        public string TenantDomain { get; set; }
-        public string LoggedOnUser { get; set; }
-        public bool AppIsAuthorized { get; set; }
-        public bool AccessTokenAquiredWithoutError { get; set; }
-        public string ErrorMessage { get; set; }
-        public string AccessToken { get; set; }
-        public string Request { get; set; }
-        public string Response { get; set; }
+   public class AppState
+   {
+      public string TenantId { get; set; }
+      public string TenantDomain { get; set; }
+      public string LoggedOnUser { get; set; }
+      public bool AppIsAuthorized { get; set; }
+      public bool AccessTokenAquiredWithoutError { get; set; }
+      public string ErrorMessage { get; set; }
+      public string AccessToken { get; set; }
+      public string Request { get; set; }
+      public string Response { get; set; }
+      public SpListJson[] RestWebLists { get; internal set; }
+      public string CsomWebTitle { get; internal set; }
+      public string CsomWebUrl { get; internal set; }
 
-        public AppState()
-        {
-            TenantId = String.Empty;
-            TenantDomain = String.Empty;
-            LoggedOnUser = String.Empty;
-            ErrorMessage = String.Empty;
-            AppIsAuthorized = false;
-            AccessTokenAquiredWithoutError = false;
-            AccessToken = String.Empty;
-            Request = String.Empty;
-            Response = String.Empty;
-        }
+      public AppState()
+      {
+         TenantId = String.Empty;
+         TenantDomain = String.Empty;
+         LoggedOnUser = String.Empty;
+         ErrorMessage = String.Empty;
+         AppIsAuthorized = false;
+         AccessTokenAquiredWithoutError = false;
+         AccessToken = String.Empty;
+         Request = String.Empty;
+         Response = String.Empty;
+      }
 
-    }
+   }
 }
 
 // MIT License: 
