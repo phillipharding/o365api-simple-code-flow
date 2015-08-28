@@ -22,6 +22,7 @@ using SimpleWebAppCodeFlow.App_Classes;
 using SimpleWebAppCodeFlow.Models;
 using System.Diagnostics;
 using Microsoft.SharePoint.Client;
+using System.Xml.Linq;
 
 namespace SimpleWebAppCodeFlow.Controllers
 {
@@ -84,6 +85,21 @@ namespace SimpleWebAppCodeFlow.Controllers
 
             return isValidName;
          }
+      }
+
+      private static async Task<string> GetFormDigest(string siteURL, string accessToken)
+      {
+         HttpClient client = new HttpClient();
+         var request = new HttpRequestMessage(HttpMethod.Post, siteURL + "/_api/contextinfo");
+         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+         var response = await client.SendAsync(request);
+         string responseString = await response.Content.ReadAsStringAsync();
+         XNamespace d = "http://schemas.microsoft.com/ado/2007/08/dataservices";
+         var root = XElement.Parse(responseString);
+         var formDigestValue = root.Element(d + "FormDigestValue").Value;
+
+         return formDigestValue;
       }
 
       //
@@ -150,14 +166,14 @@ namespace SimpleWebAppCodeFlow.Controllers
             appState.LoggedOnUser = openIDToken.upn;
 
             // Get an app-only access token for the AAD Graph Rest APIs
-            var token = await GetAccessTokenByCode(Request.Form["code"], appState.TenantId);
+            var token = await GetAccessTokenByAuthorisationCode(Request.Form["code"], appState.TenantId);
             appState.AccessToken = token.access_token;
             appState.AccessTokenAquiredWithoutError = true;
             appState.AppIsAuthorized = true;
 
             SetSessionInProgress();
 
-            /* Make a SharePoint REST call using the AAD access token */
+            /* Make a SharePoint REST (GET) call using the AAD access token */
             var siteUrl = "https://platinumdogsconsulting.sharepoint.com/sites/publishing";
             var requestUrl = siteUrl + "/_api/Web/Lists";
             var client = new HttpClient();
@@ -168,14 +184,38 @@ namespace SimpleWebAppCodeFlow.Controllers
             if (response.IsSuccessStatusCode)
             {
                var responseString = await response.Content.ReadAsStringAsync();
-               Debug.WriteLine(string.Format("\n***REST API Response:\n{0}\n", responseString));
+               Debug.WriteLine(string.Format("\n***REST (GET) API  Response:\n{0}\n", responseString));
 
                var spLists = JsonConvert.DeserializeObject<SpListJsonCollection>(responseString);
                appState.RestWebLists = spLists.d.results;
             }
             else
             {
-               Debug.WriteLine(string.Format("***RESPONSE ERROR: {0}, {1}", response.StatusCode, response.ReasonPhrase));
+               Debug.WriteLine(string.Format("***REST (GET) API RESPONSE ERROR: {0}, {1}", response.StatusCode, response.ReasonPhrase));
+            }
+
+            /* Make a SharePoint REST (POST) call using the AAD access token */
+            var formDigest = await GetFormDigest(siteUrl, token.access_token);
+
+            var announcementTitle = string.Format("Welcome from SimpleWebAppCodeFlow - {0}", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+            requestUrl = siteUrl + "/_api/Web/Lists/GetByTitle('Announcements')/Items";
+            request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata=verbose"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.access_token);
+            request.Headers.Add("X-RequestDigest", formDigest);
+
+            var requestContent = new StringContent("{ '__metadata': { 'type': 'SP.Data.AnnouncementsListItem' }, 'Title': '" + announcementTitle + "'}");
+            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json;odata=verbose");
+            request.Content = requestContent;
+            response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+               var responseString = await response.Content.ReadAsStringAsync();
+               Debug.WriteLine(string.Format("\n***REST (POST) API Response:\n{0}\n", responseString));
+            }
+            else
+            {
+               Debug.WriteLine(string.Format("***REST (POST) API RESPONSE ERROR: {0}, {1}", response.StatusCode, response.ReasonPhrase));
             }
 
             /* Make a SharePoint CSOM call using the AAD access token */
@@ -349,7 +389,7 @@ namespace SimpleWebAppCodeFlow.Controllers
          public string context;
       }
 
-      private async Task<AADCodeFlowSuccessResponse> GetAccessTokenByCode(string code, string tenantId)
+      private async Task<AADCodeFlowSuccessResponse> GetAccessTokenByAuthorisationCode(string code, string tenantId)
       {
          string tokenIssueEndpoint = appConfig.TokenIssueingUri.Replace("common", tenantId);
 
